@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quel plan est fait pour toi ? — Quiz 30 secondes</title>
+<meta name="description" content="Réponds à 5 questions et découvre le plan adapté à ton objectif." />
+
+<style>
+:root{
+  --bg:#0b0f14; --bg-soft:#121821; --card:#161d27; --line:#243040;
+  --txt:#e8eef7; --txt-soft:#9fb0c6;
+  --brand:#3ea6ff; --brand-2:#7c5cff;
+  --ok:#22c55e; --radius:14px;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --maxw:820px; --niche:#3ea6ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Inter,Arial,sans-serif;
+  background:radial-gradient(1200px 600px at 50% -10%, #1a2436 0%, var(--bg) 60%);
+  color:var(--txt); line-height:1.55; min-height:100vh;
+}
+.container{max-width:var(--maxw);margin:0 auto;padding:24px 18px 80px}
+h1,h2,h3{line-height:1.2;margin:0 0 12px}
+h1{font-size:clamp(26px,4vw,38px)}
+h2{font-size:clamp(20px,3vw,26px)}
+p{margin:0 0 14px;color:var(--txt-soft)}
+a{color:var(--niche);text-decoration:none}
+a:hover{text-decoration:underline}
+.hidden{display:none !important}
+
+.hero{padding:40px 0 20px;text-align:center}
+.hero .badge{
+  display:inline-block;padding:6px 12px;border-radius:999px;
+  background:rgba(62,166,255,.12);color:var(--brand);
+  font-size:12px;font-weight:600;letter-spacing:.4px;margin-bottom:14px;
+  border:1px solid rgba(62,166,255,.25);
+}
+.hero p{max-width:560px;margin:0 auto 22px}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 22px;border-radius:12px;border:1px solid transparent;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));
+  color:#fff;font-weight:700;font-size:16px;cursor:pointer;
+  transition:transform .12s ease, box-shadow .2s ease;
+  box-shadow:0 8px 20px rgba(62,166,255,.25);
+}
+.btn:hover{transform:translateY(-1px);text-decoration:none}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt);box-shadow:none}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.card{
+  background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);
+}
+.stack{display:grid;gap:16px}
+
+#quiz .progress{height:8px;background:var(--bg-soft);border-radius:999px;overflow:hidden;margin-bottom:18px}
+#quiz .progress > i{
+  display:block;height:100%;width:0%;
+  background:linear-gradient(90deg,var(--brand),var(--brand-2));
+  transition:width .35s ease;
+}
+#quiz .qcount{font-size:12px;color:var(--txt-soft);margin-bottom:8px;letter-spacing:.4px}
+#quiz .question{font-size:20px;font-weight:700;margin-bottom:16px}
+.options{display:grid;gap:10px}
+.option{
+  text-align:left;padding:14px 16px;border-radius:12px;
+  background:var(--bg-soft);border:1px solid var(--line);color:var(--txt);
+  cursor:pointer;font-size:15px;transition:.15s ease;
+}
+.option:hover{border-color:var(--niche);transform:translateX(2px)}
+.option.selected{border-color:var(--niche);background:rgba(62,166,255,.1)}
+
+#result .scorebar{height:10px;background:var(--bg-soft);border-radius:999px;overflow:hidden;margin:8px 0 18px}
+#result .scorebar > i{
+  display:block;height:100%;width:0%;
+  background:linear-gradient(90deg,var(--ok),#86efac);transition:width .6s ease;
+}
+
+.module{border-left:4px solid var(--niche);padding-left:18px}
+.module .tag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;
+  text-transform:uppercase;color:var(--niche);margin-bottom:8px;
+}
+.module ul{padding-left:18px;color:var(--txt-soft)}
+.module .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.disclaimer{
+  font-size:12px;color:var(--txt-soft);background:var(--bg-soft);
+  border:1px dashed var(--line);border-radius:10px;padding:12px;margin-top:14px;
+}
+
+.faq details{
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;
+  padding:12px 14px;margin-bottom:8px;
+}
+.faq summary{cursor:pointer;font-weight:600;color:var(--txt)}
+.faq p{margin:8px 0 0}
+
+.countdown{display:flex;gap:10px;justify-content:center;margin:14px 0}
+.countdown div{
+  background:var(--bg-soft);border:1px solid var(--line);border-radius:10px;
+  padding:8px 12px;min-width:60px;text-align:center;
+}
+.countdown b{display:block;font-size:20px;color:var(--niche)}
+.countdown span{font-size:11px;color:var(--txt-soft);text-transform:uppercase;letter-spacing:.5px}
+
+form.email{display:grid;gap:10px;margin-top:10px}
+form.email input{
+  padding:13px 14px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg-soft);color:var(--txt);font-size:15px;
+}
+form.email input:focus{outline:2px solid var(--niche);outline-offset:1px}
+.form-note{font-size:12px;color:var(--txt-soft)}
+
+#exitIntent{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);
+  display:flex;align-items:center;justify-content:center;z-index:999;padding:20px;
+}
+#exitIntent .card{max-width:460px;text-align:center}
+
+footer{
+  margin-top:50px;padding-top:20px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--txt-soft);text-align:center;
+}
+footer a{color:var(--txt-soft)}
+</style>
+</head>
+<body>
+
+<main class="container">
+
+  <section id="hero" class="hero">
+    <div class="badge">⚡ Quiz 30 secondes</div>
+    <h1>Quel plan est fait pour toi&nbsp;?</h1>
+    <p>Réponds à 5 questions rapides. On te montre <strong>un seul plan</strong>, celui qui correspond à ton objectif.</p>
+    <button class="btn" id="startQuiz">Démarrer le quiz →</button>
+    <p class="form-note" style="margin-top:14px">Aucune inscription requise pour commencer.</p>
+  </section>
+
+  <section id="quiz" class="card hidden">
+    <div class="progress"><i id="progressBar"></i></div>
+    <div class="qcount" id="qCount">Question 1 / 5</div>
+    <div class="question" id="qText">…</div>
+    <div class="options" id="qOptions"></div>
+    <div style="margin-top:16px;display:flex;justify-content:space-between;gap:10px">
+      <button class="btn ghost" id="backBtn" disabled>← Retour</button>
+      <button class="btn" id="nextBtn" disabled>Suivant →</button>
+    </div>
+  </section>
+
+  <section id="result" class="card hidden">
+    <span class="tag" id="resultTag" style="color:var(--niche);font-weight:700;letter-spacing:.6px;text-transform:uppercase;font-size:11px">Ton résultat</span>
+    <h2 id="resultTitle">Ton plan personnalisé est prêt</h2>
+    <div class="scorebar"><i id="scoreBar"></i></div>
+    <p id="resultDesc">…</p>
+
+    <form class="email" id="leadForm" novalidate>
+      <label for="email" style="font-size:13px;color:var(--txt-soft)">Reçois ton plan détaillé + bonus par email :</label>
+      <input type="email" id="email" name="email" placeholder="ton@email.com" required autocomplete="email" />
+      <button class="btn full" type="submit">Recevoir mon plan + bonus →</button>
+      <p class="form-note">Zéro spam. Désinscription en 1 clic.</p>
+    </form>
+
+    <div id="leadSuccess" class="hidden" style="margin-top:10px">
+      <p style="color:var(--ok);font-weight:600">✅ C’est envoyé ! Vérifie ta boîte (et les spams).</p>
+      <button class="btn full" id="revealModuleBtn">Voir mon plan maintenant →</button>
+    </div>
+  </section>
+
+  <!-- MODULES -->
+  <section id="module-health" class="card module hidden stack">
+    <span class="tag">Santé & bien-être</span>
+    <h2>Ton plan santé personnalisé</h2>
+    <p>Basé sur tes réponses, voici ton parcours :</p>
+    <ul>
+      <li>Diagnostic rapide de tes 3 habitudes bloquantes</li>
+      <li>Routine simple matin / soir (10 min)</li>
+      <li>Recommandation d’un programme ciblé</li>
+    </ul>
+    <div class="countdown" data-countdown="3600">
+      <div><b data-h>00</b><span>Heures</span></div>
+      <div><b data-m>00</b><span>Min</span></div>
+      <div><b data-s>00</b><span>Sec</span></div>
+    </div>
+    <div class="cta-row">
+      <a class="btn" data-aff="health" href="#" rel="nofollow sponsored">Voir le programme recommandé →</a>
+      <button class="btn ghost" data-faq="health">Questions fréquentes</button>
+    </div>
+    <div class="faq hidden" id="faq-health">
+      <details><summary>Est-ce que ça marche vraiment ?</summary><p>Les résultats varient selon les personnes. Aucune garantie individuelle.</p></details>
+      <details><summary>Combien de temps avant de voir un effet ?</summary><p>Variable, souvent 2 à 4 semaines avec régularité.</p></details>
+    </div>
+    <div class="disclaimer">⚠️ Ceci n’est pas un avis médical. Lien affilié : commission perçue sans surcoût pour toi.</div>
+  </section>
+
+  <section id="module-manifestation" class="card module hidden stack">
+    <span class="tag">Manifestation & mindset</span>
+    <h2>Ton plan audio personnalisé</h2>
+    <p>Ton profil correspond aux méthodes audio de reprogrammation mentale :</p>
+    <ul>
+      <li>Écoute guidée 10 min / jour</li>
+      <li>Journal de gratitude (3 lignes)</li>
+      <li>Programme audio recommandé</li>
+    </ul>
+    <div class="countdown" data-countdown="3600">
+      <div><b data-h>00</b><span>Heures</span></div>
+      <div><b data-m>00</b><span>Min</span></div>
+      <div><b data-s>00</b><span>Sec</span></div>
+    </div>
+    <div class="cta-row">
+      <a class="btn" data-aff="manifestation" href="#" rel="nofollow sponsored">Écouter l’audio recommandé →</a>
+      <button class="btn ghost" data-faq="manifestation">Questions fréquentes</button>
+    </div>
+    <div class="faq hidden" id="faq-manifestation">
+      <details><summary>Ça marche pour tout le monde ?</summary><p>Non. Aucun résultat garanti.</p></details>
+      <details><summary>Combien de temps par jour ?</summary><p>10 minutes suffisent pour commencer.</p></details>
+    </div>
+    <div class="disclaimer">⚠️ Aucun résultat garanti. Lien affilié.</div>
+  </section>
+
+  <section id="module-ia" class="card module hidden stack">
+    <span class="tag">IA & productivité</span>
+    <h2>Ton plan IA personnalisé</h2>
+    <p>Ton profil correspond aux outils IA et automatisation :</p>
+    <ul>
+      <li>Générateur de prompts (démo)</li>
+      <li>Comparatif des 3 meilleurs outils</li>
+      <li>Recommandation adaptée à ton usage</li>
+    </ul>
+    <div class="cta-row">
+      <a class="btn" data-aff="ia" href="#" rel="nofollow sponsored">Voir l’outil recommandé →</a>
+      <button class="btn ghost" data-faq="ia">Questions fréquentes</button>
+    </div>
+    <div class="faq hidden" id="faq-ia">
+      <details><summary>C’est pour débutants ?</summary><p>Oui, pensés pour être utilisés sans compétence technique.</p></details>
+      <details><summary>Y a-t-il un essai gratuit ?</summary><p>La plupart proposent un plan gratuit ou une démo.</p></details>
+    </div>
+    <div class="disclaimer">⚠️ Lien affilié : commission perçue sans surcoût pour toi.</div>
+  </section>
+
+  <section id="module-mmo" class="card module hidden stack">
+    <span class="tag">Business en ligne</span>
+    <h2>Ton plan business personnalisé</h2>
+    <p>Ton profil correspond au freelancing / e-commerce / affiliation :</p>
+    <ul>
+      <li>Étude de cas : de 0 à 1 000 € / mois</li>
+      <li>Stack d’outils minimale</li>
+      <li>Formation recommandée</li>
+    </ul>
+    <div class="countdown" data-countdown="3600">
+      <div><b data-h>00</b><span>Heures</span></div>
+      <div><b data-m>00</b><span>Min</span></div>
+      <div><b data-s>00</b><span>Sec</span></div>
+    </div>
+    <div class="cta-row">
+      <a class="btn" data-aff="mmo" href="#" rel="nofollow sponsored">Voir la formation recommandée →</a>
+      <button class="btn ghost" data-faq="mmo">Questions fréquentes</button>
+    </div>
+    <div class="faq hidden" id="faq-mmo">
+      <details><summary>Combien de temps pour les premiers résultats ?</summary><p>Variable. Aucun revenu garanti.</p></details>
+      <details><summary>Faut-il un budget de départ ?</summary><p>Un petit budget aide, mais pas obligatoire.</p></details>
+    </div>
+    <div class="disclaimer">⚠️ Aucun revenu garanti. Lien affilié.</div>
+  </section>
+
+  <section id="module-finance" class="card module hidden stack">
+    <span class="tag">Finance personnelle</span>
+    <h2>Ton plan finance personnalisé</h2>
+    <p>Ton profil correspond à la gestion de budget et aux outils de suivi :</p>
+    <ul>
+      <li>Calculateur d’épargne (démo)</li>
+      <li>Comparatif des 3 meilleurs outils</li>
+      <li>Recommandation adaptée</li>
+    </ul>
+    <div class="cta-row">
+      <a class="btn" data-aff="finance" href="#" rel="nofollow sponsored">Voir l’outil recommandé →</a>
+      <button class="btn ghost" data-faq="finance">Questions fréquentes</button>
+    </div>
+    <div class="faq hidden" id="faq-finance">
+      <details><summary>Est-ce un conseil financier ?</summary><p>Non, informatif uniquement.</p></details>
+      <details><summary>Y a-t-il des risques ?</summary><p>Tout investissement comporte un risque de perte en capital.</p></details>
+    </div>
+    <div class="disclaimer">⚠️ Ceci n’est pas un conseil financier. Lien affilié.</div>
+  </section>
+
+  <footer>
+    <p id="privacy">Mentions : cette page contient des liens affiliés. Je perçois une commission si tu achètes via mes liens, sans surcoût pour toi.</p>
+    <p>© <span id="year"></span> — Tous droits réservés.</p>
+  </footer>
+
+</main>
+
+<div id="exitIntent" class="hidden">
+  <div class="card">
+    <h3>Attends une seconde 👋</h3>
+    <p>Ton plan personnalisé t’attend. Reçois-le par email en 10 secondes.</p>
+    <form class="email" id="exitForm">
+      <input type="email" id="exitEmail" placeholder="ton@email.com" required />
+      <button class="btn full" type="submit">Recevoir mon plan →</button>
+      <button type="button" class="btn ghost full" id="exitClose">Non merci</button>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ============ CONFIG ============ */
+const CONFIG = {
+  affiliates: {
+    health:        "https://TON-LIEN-AFFILIE-HEALTH",
+    manifestation: "https://TON-LIEN-AFFILIE-MANIFESTATION",
+    ia:            "https://TON-LIEN-AFFILIE-IA",
+    mmo:           "https://TON-LIEN-AFFILIE-MMO",
+    finance:       "https://TON-LIEN-AFFILIE-FINANCE"
+  },
+  colors: {
+    health:"#22c55e", manifestation:"#a855f7",
+    ia:"#3ea6ff", mmo:"#f59e0b", finance:"#06b6d4"
+  },
+  apiBase: null
+};
+
+/* ============ SECTEURS (Q1) ============ */
+const SECTORS = [
+  { id:"health",        label:"Perdre du poids / mieux dormir" },
+  { id:"manifestation", label:"Attirer plus de réussite" },
+  { id:"ia",            label:"Gagner du temps avec l’IA" },
+  { id:"mmo",           label:"Lancer un business en ligne" },
+  { id:"finance",       label:"Mieux gérer mon argent" }
+];
+
+/* ============ SOUS-QUIZ PAR SECTEUR ============ */
+const SECTOR_QUIZ = {
+  health: { questions: [
+    { id:"h1", text:"Quel est ton axe prioritaire ?", options:[
+      { label:"Perte de poids", tag:"weight", heat:1 },
+      { label:"Sommeil", tag:"sleep", heat:1 },
+      { label:"Énergie / fatigue", tag:"energy", heat:1 },
+      { label:"Douleurs / articulations", tag:"pain", heat:1 }
+    ]},
+    { id:"h2", text:"Depuis combien de temps ?", options:[
+      { label:"Moins de 3 mois", heat:1 },
+      { label:"3 à 12 mois", heat:1 },
+      { label:"Plus d’un an", heat:2 }
+    ]},
+    { id:"h3", text:"Qu’as-tu déjà essayé ?", options:[
+      { label:"Rien", heat:0 },
+      { label:"Régimes / sport", heat:1 },
+      { label:"Compléments", heat:2 },
+      { label:"Plusieurs choses sans résultat", heat:3 }
+    ]},
+    { id:"h4", text:"Quel budget ?", options:[
+      { label:"0 €", heat:0 },
+      { label:"Moins de 50 €", heat:1 },
+      { label:"50–150 €", heat:2 },
+      { label:"150 € et +", heat:3 }
+    ]}
+  ]},
+
+  manifestation: { questions: [
+    { id:"m1", text:"Ton blocage principal ?", options:[
+      { label:"Confiance en moi", tag:"confidence", heat:1 },
+      { label:"Argent", tag:"money", heat:1 },
+      { label:"Relations", tag:"relations", heat:1 },
+      { label:"Sens / direction", tag:"purpose", heat:1 }
+    ]},
+    { id:"m2", text:"Qu’as-tu déjà pratiqué ?", options:[
+      { label:"Rien", heat:0 },
+      { label:"Méditation", heat:1 },
+      { label:"Visualisation", heat:2 },
+      { label:"Affirmations", heat:2 }
+    ]},
+    { id:"m3", text:"Combien de temps par jour ?", options:[
+      { label:"5 minutes", heat:0 },
+      { label:"10 minutes", heat:1 },
+      { label:"20 minutes +", heat:2 }
+    ]},
+    { id:"m4", text:"Quel format préfères-tu ?", options:[
+      { label:"Audio", heat:2 },
+      { label:"Vidéo", heat:1 },
+      { label:"Texte", heat:1 },
+      { label:"Coaching", heat:3 }
+    ]}
+  ]},
+
+  ia: { questions: [
+    { id:"i1", text:"Ton usage principal ?", options:[
+      { label:"Rédaction", tag:"writing", heat:1 },
+      { label:"Image / vidéo", tag:"visual", heat:1 },
+      { label:"Automatisation", tag:"automation", heat:2 },
+      { label:"Chat / assistant", tag:"chat", heat:1 }
+    ]},
+    { id:"i2", text:"Ton niveau actuel ?", options:[
+      { label:"Débutant total", heat:0 },
+      { label:"J’ai testé ChatGPT", heat:1 },
+      { label:"J’utilise quelques outils", heat:2 },
+      { label:"Avancé", heat:3 }
+    ]},
+    { id:"i3", text:"Ton objectif ?", options:[
+      { label:"Gagner du temps", heat:1 },
+      { label:"Créer du contenu", heat:2 },
+      { label:"Gagner de l’argent avec l’IA", heat:3 },
+      { label:"Automatiser mon business", heat:3 }
+    ]},
+    { id:"i4", text:"Budget mensuel ?", options:[
+      { label:"0 €", heat:0 },
+      { label:"Moins de 30 €", heat:1 },
+      { label:"30–100 €", heat:2 },
+      { label:"100 € et +", heat:3 }
+    ]}
+  ]},
+
+  mmo: { questions: [
+    { id:"b1", text:"Quel modèle t’attire ?", options:[
+      { label:"Freelancing", tag:"freelance", heat:1 },
+      { label:"E-commerce", tag:"ecom", heat:2 },
+      { label:"Affiliation", tag:"affiliate", heat:2 },
+      { label:"Print on demand", tag:"pod", heat:1 },
+      { label:"Coaching / info-produit", tag:"coaching", heat:3 }
+    ]},
+    { id:"b2", text:"Ton expérience ?", options:[
+      { label:"Zéro", heat:0 },
+      { label:"Tenté sans succès", heat:1 },
+      { label:"Quelques ventes", heat:2 },
+      { label:"Je gagne déjà", heat:3 }
+    ]},
+    { id:"b3", text:"Temps par semaine ?", options:[
+      { label:"Moins de 5 h", heat:0 },
+      { label:"5 à 15 h", heat:1 },
+      { label:"15 à 30 h", heat:2 },
+      { label:"Temps plein", heat:3 }
+    ]},
+    { id:"b4", text:"Budget de départ ?", options:[
+      { label:"0 €", heat:0 },
+      { label:"Moins de 100 €", heat:1 },
+      { label:"100–500 €", heat:2 },
+      { label:"500 € et +", heat:3 }
+    ]}
+  ]},
+
+  finance: { questions: [
+    { id:"f1", text:"Ta priorité ?", options:[
+      { label:"Sortir des dettes", tag:"debt", heat:1 },
+      { label:"Épargner", tag:"save", heat:1 },
+      { label:"Investir", tag:"invest", heat:2 },
+      { label:"Suivre mon budget", tag:"budget", heat:1 }
+    ]},
+    { id:"f2", text:"Ta situation ?", options:[
+      { label:"Découvert / dettes", heat:0 },
+      { label:"Équilibré, 0 épargne", heat:1 },
+      { label:"Quelques économies", heat:2 },
+      { label:"J’investis déjà", heat:3 }
+    ]},
+    { id:"f3", text:"Ton horizon ?", options:[
+      { label:"Court terme", heat:1 },
+      { label:"Moyen (1–5 ans)", heat:2 },
+      { label:"Long (5 ans +)", heat:2 }
+    ]},
+    { id:"f4", text:"Quel format ?", options:[
+      { label:"Outil / app", heat:2 },
+      { label:"Formation", heat:2 },
+      { label:"Coaching", heat:3 },
+      { label:"Newsletter", heat:1 }
+    ]}
+  ]}
+};
+
+const NICHE_TITLES = {
+  health:"Santé & bien-être", manifestation:"Manifestation & mindset",
+  ia:"IA & productivité", mmo:"Business en ligne", finance:"Finance personnelle"
+};
+
+/* ============ ÉTAT ============ */
+const state = {
+  step: 0,
+  sector: null,
+  answers: {},
+  profile: { focus:null, heat:0, temp:"froid" },
+  lead: null
+};
+
+/* ============ TRACKING ============ */
+const TRACK = {
+  utm:{},
+  init(){
+    const p = new URLSearchParams(location.search);
+    ["utm_source","utm_medium","utm_campaign","utm_content","utm_term","subid"].forEach(k=>{
+      if(p.get(k)) this.utm[k]=p.get(k);
+    });
+    if(Object.keys(this.utm).length){
+      try{ localStorage.setItem("funnel_utm", JSON.stringify(this.utm)); }catch(e){}
+    } else {
+      try{ this.utm = JSON.parse(localStorage.getItem("funnel_utm")||"{}"); }catch(e){}
+    }
+  },
+  event(name, data={}){
+    const payload = { name, ts:Date.now(), ...this.utm, ...data };
+    console.log("[track]", payload);
+    if(CONFIG.apiBase){
+      fetch(CONFIG.apiBase+"/api/track",{
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload), keepalive:true
+      }).catch(()=>{});
+    }
+  },
+  affiliateUrl(niche){
+    const base = CONFIG.affiliates[niche] || "#";
+    const sub = this.utm.subid || this.utm.utm_source || "direct";
+    const sep = base.includes("?") ? "&" : "?";
+    return base + sep + "subid=" + encodeURIComponent(sub);
+  }
+};
+
+/* ============ HELPERS ============ */
+const $  = (s,r=document)=> r.querySelector(s);
+const $$ = (s,r=document)=> [...r.querySelectorAll(s)];
+
+const el = {
+  hero:$("#hero"), quiz:$("#quiz"), result:$("#result"),
+  qText:$("#qText"), qOptions:$("#qOptions"), qCount:$("#qCount"),
+  progress:$("#progressBar"), next:$("#nextBtn"), back:$("#backBtn"),
+  start:$("#startQuiz"),
+  resultTag:$("#resultTag"), resultTitle:$("#resultTitle"),
+  resultDesc:$("#resultDesc"), scoreBar:$("#scoreBar"),
+  leadForm:$("#leadForm"), leadSuccess:$("#leadSuccess"),
+  revealBtn:$("#revealModuleBtn")
+};
+
+function totalSteps(){
+  return state.sector ? 1 + SECTOR_QUIZ[state.sector].questions.length : 5;
+}
+function currentQ(){
+  if(state.step === 0) return { text:"Quel est ton objectif principal ?", options: SECTORS, key:"sector" };
+  const q = SECTOR_QUIZ[state.sector].questions[state.step-1];
+  return { ...q, key: q.id };
+}
+
+/* ============ QUIZ ============ */
+function startQuiz(){
+  state.step = 0;
+  state.sector = null;
+  state.answers = {};
+  state.profile = { focus:null, heat:0, temp:"froid" };
+  el.hero.classList.add("hidden");
+  el.quiz.classList.remove("hidden");
+  TRACK.event("quiz_start");
+  renderStep();
+  restoreQuiz();
+}
+
+function renderStep(){
+  const q = currentQ();
+  const total = totalSteps();
+
+  el.qCount.textContent = `Question ${state.step+1} / ${total}`;
+  el.progress.style.width = ((state.step)/total*100)+"%";
+  el.qText.textContent = q.text;
+
+  el.qOptions.innerHTML = "";
+  q.options.forEach((opt,i)=>{
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "option" + (state.answers[q.key]===i ? " selected":"");
+    b.textContent = opt.label;
+    b.onclick = ()=> selectOption(q.key, i, opt);
+    el.qOptions.appendChild(b);
+  });
+
+  el.back.disabled = state.step===0;
+  el.next.disabled = state.answers[q.key]===undefined;
+  el.next.textContent = (state.step === total-1) ? "Voir mon plan →" : "Suivant →";
+  saveQuiz();
+}
+
+function selectOption(key, idx, opt){
+  state.answers[key] = idx;
+
+  if(state.step === 0){
+    state.sector = opt.id;
+    document.documentElement.style.setProperty("--niche", CONFIG.colors[opt.id]);
+    TRACK.event("sector_selected", { sector: opt.id });
+  }
+
+  $$(".option").forEach((b,i)=> b.classList.toggle("selected", i===idx));
+  el.next.disabled = false;
+  saveQuiz();
+}
+
+function nextQuestion(){
+  const q = currentQ();
+  if(state.answers[q.key] === undefined) return;
+
+  if(state.step === totalSteps()-1){
+    computeProfile();
+    showResult();
+  } else {
+    state.step++;
+    renderStep();
+  }
+}
+function prevQuestion(){
+  if(state.step>0){ state.step--; renderStep(); }
+}
+
+/* ============ PROFIL ============ */
+function computeProfile(){
+  const qs = SECTOR_QUIZ[state.sector].questions;
+  let heat = 0, focus = null;
+  qs.forEach(q=>{
+    const idx = state.answers[q.id];
+    if(idx===undefined) return;
+    const opt = q.options[idx];
+    if(typeof opt.heat === "number") heat += opt.heat;
+    if(opt.tag && !focus) focus = opt.tag;
+  });
+  const temp = heat >= 9 ? "très chaud" : heat >= 6 ? "chaud" : heat >= 3 ? "tiède" : "froid";
+  state.profile = { focus, heat, temp };
+  TRACK.event("quiz_complete", { sector: state.sector, focus, heat, temp });
+}
+
+/* ============ RÉSULTAT ============ */
+function showResult(){
+  el.quiz.classList.add("hidden");
+  el.result.classList.remove("hidden");
+
+  const p = state.profile;
+  const pct = Math.min(100, Math.round((p.heat / 12) * 100));
+
+  el.resultTag.textContent = "Ton résultat";
+  el.resultTitle.textContent = `Profil : ${NICHE_TITLES[state.sector]}`;
+  el.resultDesc.textContent =
+    `Axe prioritaire : ${p.focus || "général"} · Engagement : ${p.temp}. ` +
+    `Ton plan s’affiche après avoir reçu ton email.`;
+
+  setTimeout(()=> el.scoreBar.style.width = pct+"%", 100);
+  TRACK.event("result_shown", { sector: state.sector, temp: p.temp, pct });
+}
+
+async function submitLead(email, source="main"){
+  const payload = {
+    email, sector: state.sector, profile: state.profile,
+    answers: state.answers, utm: TRACK.utm, source, ts: Date.now()
+  };
+  if(CONFIG.apiBase){
+    try{
+      const r = await fetch(CONFIG.apiBase+"/api/lead",{
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify(payload)
+      });
+      if(r.ok) return true;
+    }catch(e){}
+  }
+  try{
+    const leads = JSON.parse(localStorage.getItem("funnel_leads")||"[]");
+    leads.push(payload);
+    localStorage.setItem("funnel_leads", JSON.stringify(leads));
+  }catch(e){}
+  return true;
+}
+
+/* ============ MODULE ============ */
+function showModule(niche){
+  $$(".module").forEach(m=> m.classList.add("hidden"));
+  const mod = document.getElementById("module-"+niche);
+  if(!mod) return;
+
+  const h2 = mod.querySelector("h2");
+  if(h2 && state.profile.focus){
+    h2.textContent = `Ton plan ${NICHE_TITLES[niche]} — axe ${state.profile.focus}`;
+  }
+
+  $$("a[data-aff]", mod).forEach(a=>{
+    const key = a.getAttribute("data-aff");
+    a.href = TRACK.affiliateUrl(key);
+    a.target = "_blank";
+    a.addEventListener("click", ()=> TRACK.event("affiliate_click",{ niche:key }));
+  });
+
+  mod.classList.remove("hidden");
+  el.result.classList.add("hidden");
+  mod.scrollIntoView({ behavior:"smooth", block:"start" });
+  initCountdowns(mod);
+  initFaqs(mod);
+  TRACK.event("module_shown", { niche, temp: state.profile.temp });
+}
+
+/* ============ RÉTENTION ============ */
+function initCountdowns(scope=document){
+  $$("[data-countdown]", scope).forEach(box=>{
+    if(box.dataset.done) return;
+    box.dataset.done = "1";
+    let total = parseInt(box.dataset.countdown,10) || 3600;
+    const key = "cd_"+box.closest(".module").id;
+    const saved = parseInt(localStorage.getItem(key)||"0",10);
+    if(saved && saved > Date.now()) total = Math.floor((saved-Date.now())/1000);
+    else localStorage.setItem(key, Date.now()+total*1000);
+
+    const h = box.querySelector("[data-h]");
+    const m = box.querySelector("[data-m]");
+    const s = box.querySelector("[data-s]");
+    const tick = ()=>{
+      if(total<=0) return;
+      h.textContent = String(Math.floor(total/3600)).padStart(2,"0");
+      m.textContent = String(Math.floor((total%3600)/60)).padStart(2,"0");
+      s.textContent = String(total%60).padStart(2,"0");
+      total--;
+    };
+    tick();
+    setInterval(tick, 1000);
+  });
+}
+
+function initFaqs(scope=document){
+  $$("[data-faq]", scope).forEach(btn=>{
+    btn.onclick = ()=>{
+      const box = document.getElementById("faq-"+btn.dataset.faq);
+      if(box) box.classList.toggle("hidden");
+    };
+  });
+}
+
+function initExitIntent(){
+  let fired = false;
+  const show = ()=>{
+    if(fired) return;
+    if(localStorage.getItem("exit_shown")==="1") return;
+    fired = true;
+    localStorage.setItem("exit_shown","1");
+    $("#exitIntent").classList.remove("hidden");
+    TRACK.event("exit_intent_shown");
+  };
+  document.addEventListener("mouseout", e=>{
+    if(e.clientY <= 0 && !e.relatedTarget) show();
+  });
+  setTimeout(show, 45000);
+}
+
+/* ============ PERSISTANCE ============ */
+function saveQuiz(){
+  try{
+    localStorage.setItem("funnel_quiz_state", JSON.stringify({
+      step: state.step, sector: state.sector, answers: state.answers
+    }));
+  }catch(e){}
+}
+function restoreQuiz(){
+  try{
+    const raw = localStorage.getItem("funnel_quiz_state");
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    if(data && data.answers && Object.keys(data.answers).length && data.sector){
+      state.sector = data.sector;
+      state.answers = data.answers;
+      state.step = Math.min(data.step||0, totalSteps()-1);
+      document.documentElement.style.setProperty("--niche", CONFIG.colors[state.sector]);
+      renderStep();
+    }
+  }catch(e){}
+}
+
+/* ============ BINDINGS ============ */
+el.start.addEventListener("click", startQuiz);
+el.next.addEventListener("click", nextQuestion);
+el.back.addEventListener("click", prevQuestion);
+
+el.leadForm.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const email = $("#email").value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ $("#email").focus(); return; }
+  const btn = el.leadForm.querySelector("button");
+  btn.disabled = true; btn.textContent = "Envoi…";
+  state.lead = email;
+  await submitLead(email, "main");
+  el.leadForm.classList.add("hidden");
+  el.leadSuccess.classList.remove("hidden");
+  TRACK.event("lead_captured", { sector: state.sector, temp: state.profile.temp });
+  btn.disabled = false;
+});
+
+el.revealBtn.addEventListener("click", ()=> showModule(state.sector));
+
+$("#exitClose").addEventListener("click", ()=> $("#exitIntent").classList.add("hidden"));
+$("#exitForm").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const email = $("#exitEmail").value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+  await submitLead(email, "exit");
+  $("#exitIntent").classList.add("hidden");
+  TRACK.event("lead_captured", { sector: state.sector || "unknown", source:"exit" });
+});
+
+/* ============ INIT ============ */
+(function init(){
+  TRACK.init();
+  initExitIntent();
+  const y = $("#year"); if(y) y.textContent = new Date().getFullYear();
+  TRACK.event("page_view");
+  console.log("[funnel] init OK");
+})();
+</script>
+</body>
+</html>
