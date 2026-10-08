@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quel plan est fait pour toi ? Quiz 30 secondes</title>
+<meta name="description" content="Réponds à quelques questions et découvre le plan adapté à ton objectif.">
+<style>
+:root{--bg:#0b0f14;--soft:#121821;--card:#161d27;--line:#243040;--txt:#e8eef7;--mut:#9fb0c6;--b1:#3ea6ff;--b2:#7c5cff;--ok:#22c55e;--niche:#3ea6ff}
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:radial-gradient(1200px 600px at 50% -10%,#1a2436,var(--bg) 60%);color:var(--txt);line-height:1.55;min-height:100vh}
+.container{max-width:820px;margin:0 auto;padding:24px 18px 80px}
+h1,h2,h3{line-height:1.2;margin:0 0 12px}h1{font-size:clamp(26px,4vw,38px)}h2{font-size:clamp(20px,3vw,26px)}
+p{margin:0 0 14px;color:var(--mut)}a{color:var(--niche)}.hidden{display:none!important}
+.hero{padding:40px 0 20px;text-align:center}.hero p{max-width:560px;margin:0 auto 22px}
+.badge{display:inline-block;padding:6px 12px;border-radius:999px;background:rgba(62,166,255,.12);color:var(--b1);font-size:12px;font-weight:600;margin-bottom:14px;border:1px solid rgba(62,166,255,.25)}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 22px;border-radius:12px;border:1px solid transparent;background:linear-gradient(135deg,var(--b1),var(--b2));color:#fff;font:700 16px system-ui,sans-serif;cursor:pointer;text-decoration:none}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--txt)}.btn.full{width:100%}.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,.option:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--niche);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 10px 30px rgba(0,0,0,.35);margin-top:16px}
+.stack{display:grid;gap:16px}
+.bar{height:8px;background:var(--soft);border-radius:999px;overflow:hidden;margin-bottom:18px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--b1),var(--b2));transition:width .35s}
+.qcount{font-size:12px;color:var(--mut);margin-bottom:8px}.question{font-size:20px;font-weight:700;margin-bottom:16px}
+.options{display:grid;gap:10px}
+.option{text-align:left;padding:14px 16px;border-radius:12px;background:var(--soft);border:1px solid var(--line);color:var(--txt);cursor:pointer;font:15px system-ui,sans-serif}
+.option:hover,.option.selected{border-color:var(--niche)}.option.selected{background:rgba(62,166,255,.1)}
+.tag{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--niche)}
+.module{border-left:4px solid var(--niche);padding-left:18px}.module ul{padding-left:18px;color:var(--mut)}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.disc{font-size:12px;color:var(--mut);background:var(--soft);border:1px dashed var(--line);border-radius:10px;padding:12px}
+details{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:8px}summary{cursor:pointer;font-weight:600}
+form.email{display:grid;gap:10px;margin-top:10px}
+input[type=email]{padding:13px 14px;border-radius:10px;border:1px solid var(--line);background:var(--soft);color:var(--txt);font-size:15px}
+.note{font-size:12px;color:var(--mut)}.chk{display:flex;gap:8px;align-items:flex-start}.chk input{margin-top:3px}.err{color:#f87171}
+#exitIntent{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9;padding:20px}
+#exitIntent .card{max-width:460px;margin:0}
+footer{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--mut);text-align:center}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head>
+<body>
+<main class="container">
+<section id="hero" class="hero">
+ <div class="badge">Quiz 30 secondes</div>
+ <h1>Quel plan est fait pour toi&nbsp;?</h1>
+ <p>Réponds à quelques questions rapides. On te montre <strong>un seul plan</strong>, celui qui correspond à ton objectif.</p>
+ <div class="row" style="justify-content:center"><button class="btn" id="startQuiz">Démarrer le quiz</button><button class="btn ghost hidden" id="resumeQuiz">Reprendre mon quiz</button></div>
+ <p class="note" style="margin-top:14px">Aucune inscription requise pour commencer.</p>
+</section>
+<section id="quiz" class="card hidden">
+ <div class="bar" id="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><i id="barFill"></i></div>
+ <div class="qcount" id="qCount"></div><div class="question" id="qText"></div><div class="options" id="qOptions"></div>
+ <div class="row" style="margin-top:16px;justify-content:space-between"><button class="btn ghost" id="backBtn">Retour</button><button class="btn" id="nextBtn" disabled>Suivant</button></div>
+</section>
+<section id="result" class="card hidden">
+ <span class="tag">Ton résultat</span><h2 id="resultTitle"></h2>
+ <div class="bar" aria-hidden="true"><i id="scoreFill"></i></div><p id="resultDesc"></p>
+ <form class="email" id="leadForm" novalidate>
+  <label for="email" class="note">Reçois ton plan détaillé par email :</label>
+  <input type="email" id="email" placeholder="ton@email.com" required autocomplete="email">
+  <label class="chk note"><input type="checkbox" id="consent"><span>J'accepte de recevoir mon plan et des emails de conseils. Désinscription à tout moment. <a href="privacy.html">Confidentialité</a></span></label>
+  <input type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+  <p id="leadError" class="note err hidden" role="alert">L'inscription n'a pas pu être enregistrée. Réessaie dans un instant.</p>
+  <button class="btn full" type="submit">Recevoir mon plan</button>
+ </form>
+ <div id="leadOk" class="hidden"><p style="color:var(--ok);font-weight:600">Inscription enregistrée. Ton plan est prêt.</p><button class="btn full" id="revealBtn">Voir mon plan</button></div>
+</section>
+<section id="module" class="card module hidden stack"></section>
+<footer><p>Cette page contient des liens affiliés : je perçois une commission si tu achètes via mes liens, sans surcoût pour toi.</p><p><a href="privacy.html">Politique de confidentialité</a> · © <span id="year"></span></p></footer>
+</main>
+<div id="exitIntent" class="hidden" role="dialog" aria-modal="true"><div class="card">
+ <h3>Avant de partir</h3><p>Reçois ton plan personnalisé par email.</p>
+ <form class="email" id="exitForm" novalidate>
+  <input type="email" id="exitEmail" placeholder="ton@email.com" required aria-label="Ton email">
+  <label class="chk note"><input type="checkbox" id="exitConsent"><span>J'accepte de recevoir mon plan et des emails de conseils. <a href="privacy.html">Confidentialité</a></span></label>
+  <p id="exitError" class="note err hidden" role="alert">Inscription impossible pour le moment.</p>
+  <button class="btn full" type="submit">Recevoir mon plan</button><button type="button" class="btn ghost full" id="exitClose">Non merci</button>
+ </form></div></div>
+<script>
+/* ===== CONFIG ===== */
+const CONFIG={
+ apiBase:"https://brevo-lead-api.vercel.app",
+ // Un lien par secteur. Pour une offre précise par axe, ajoute une clé "secteur:axe" (ex : "health:sleep").
+ affiliates:{
+  health:"https://8c263dygs--hoo61kd3jwa8g1d.hop.clickbank.net",
+  manifestation:"https://TON-LIEN-AFFILIE-MANIFESTATION",
+  ia:"https://TON-LIEN-AFFILIE-IA",
+  mmo:"https://TON-LIEN-AFFILIE-MMO",
+  finance:"https://TON-LIEN-AFFILIE-FINANCE"},
+ colors:{health:"#22c55e",manifestation:"#a855f7",ia:"#3ea6ff",mmo:"#f59e0b",finance:"#06b6d4"}
+};
+const SECTORS=[["health","Perdre du poids / mieux dormir"],["manifestation","Attirer plus de réussite"],["ia","Gagner du temps avec l’IA"],["mmo","Lancer un business en ligne"],["finance","Mieux gérer mon argent"]];
+const TITLES={health:"Santé & bien-être",manifestation:"Manifestation & mindset",ia:"IA & productivité",mmo:"Business en ligne",finance:"Finance personnelle"};
+const FOCUS={weight:"perte de poids",sleep:"sommeil",energy:"énergie",pain:"douleurs et articulations",confidence:"confiance en soi",money:"argent",relations:"relations",purpose:"sens et direction",writing:"rédaction",visual:"image et vidéo",automation:"automatisation",chat:"assistant IA",freelance:"freelancing",ecom:"e-commerce",affiliate:"affiliation",pod:"print on demand",coaching:"coaching et info-produit",debt:"sortir des dettes",save:"épargne",invest:"investissement",budget:"suivi du budget"};
+// Questions : [texte, [[libellé, score, axe?], ...]]
+const SQ={
+health:[["Quel est ton axe prioritaire ?",[["Perte de poids",1,"weight"],["Sommeil",1,"sleep"],["Énergie / fatigue",1,"energy"],["Douleurs / articulations",1,"pain"]]],["Depuis combien de temps ?",[["Moins de 3 mois",1],["3 à 12 mois",1],["Plus d’un an",2]]],["Qu’as-tu déjà essayé ?",[["Rien",0],["Régimes / sport",1],["Compléments",2],["Plusieurs choses sans résultat",3]]],["Quel budget ?",[["0 €",0],["Moins de 50 €",1],["50–150 €",2],["150 € et +",3]]]],
+manifestation:[["Ton blocage principal ?",[["Confiance en moi",1,"confidence"],["Argent",1,"money"],["Relations",1,"relations"],["Sens / direction",1,"purpose"]]],["Qu’as-tu déjà pratiqué ?",[["Rien",0],["Méditation",1],["Visualisation",2],["Affirmations",2]]],["Combien de temps par jour ?",[["5 minutes",0],["10 minutes",1],["20 minutes +",2]]],["Quel format préfères-tu ?",[["Audio",2],["Vidéo",1],["Texte",1],["Coaching",3]]]],
+ia:[["Ton usage principal ?",[["Rédaction",1,"writing"],["Image / vidéo",1,"visual"],["Automatisation",2,"automation"],["Chat / assistant",1,"chat"]]],["Ton niveau actuel ?",[["Débutant total",0],["J’ai testé ChatGPT",1],["J’utilise quelques outils",2],["Avancé",3]]],["Ton objectif ?",[["Gagner du temps",1],["Créer du contenu",2],["Gagner de l’argent avec l’IA",3],["Automatiser mon business",3]]],["Budget mensuel ?",[["0 €",0],["Moins de 30 €",1],["30–100 €",2],["100 € et +",3]]]],
+mmo:[["Quel modèle t’attire ?",[["Freelancing",1,"freelance"],["E-commerce",2,"ecom"],["Affiliation",2,"affiliate"],["Print on demand",1,"pod"],["Coaching / info-produit",3,"coaching"]]],["Ton expérience ?",[["Zéro",0],["Tenté sans succès",1],["Quelques ventes",2],["Je gagne déjà",3]]],["Temps par semaine ?",[["Moins de 5 h",0],["5 à 15 h",1],["15 à 30 h",2],["Temps plein",3]]],["Budget de départ ?",[["0 €",0],["Moins de 100 €",1],["100–500 €",2],["500 € et +",3]]]],
+finance:[["Ta priorité ?",[["Sortir des dettes",1,"debt"],["Épargner",1,"save"],["Investir",2,"invest"],["Suivre mon budget",1,"budget"]]],["Ta situation ?",[["Découvert / dettes",0],["Équilibré, 0 épargne",1],["Quelques économies",2],["J’investis déjà",3]]],["Ton horizon ?",[["Court terme",1],["Moyen (1–5 ans)",2],["Long (5 ans +)",2]]],["Quel format ?",[["Outil / app",2],["Formation",2],["Coaching",3],["Newsletter",1]]]]
+};
+const MOD={
+health:{tag:"Santé & bien-être",bul:["Diagnostic rapide de tes habitudes bloquantes","Routine simple matin / soir (10 min)","Une recommandation ciblée sur ton axe"],cta:"Voir le programme recommandé",faq:[["Est-ce que ça marche vraiment ?","Les résultats varient selon les personnes. Aucune garantie individuelle."],["Faut-il un avis médical ?","Si tu as un doute ou un traitement en cours, parles-en d'abord à un professionnel de santé."]],disc:"Ceci n’est pas un avis médical."},
+manifestation:{tag:"Manifestation & mindset",bul:["Écoute guidée de 10 minutes par jour","Journal de gratitude (3 lignes)","Un programme audio adapté à ton blocage"],cta:"Écouter l’audio recommandé",faq:[["Ça marche pour tout le monde ?","Non. Aucun résultat n'est garanti."],["Combien de temps par jour ?","10 minutes suffisent pour commencer."]],disc:"Aucun résultat n'est garanti."},
+ia:{tag:"IA & productivité",bul:["Générateur de prompts (démo)","Comparatif de quelques outils","Une recommandation adaptée à ton usage"],cta:"Voir l’outil recommandé",faq:[["C’est pour débutants ?","Oui, ces outils s'utilisent sans compétence technique."],["Y a-t-il un essai gratuit ?","La plupart proposent un plan gratuit ou une démo."]],disc:"Les fonctions et tarifs peuvent changer : vérifie sur le site de l'éditeur."},
+mmo:{tag:"Business en ligne",bul:["Panorama des modèles (freelance, e-commerce, affiliation)","Une pile d’outils minimale pour démarrer","Une formation adaptée à ton niveau"],cta:"Voir la formation recommandée",faq:[["Combien de temps pour les premiers résultats ?","Variable. Aucun revenu n'est garanti."],["Faut-il un budget de départ ?","Un petit budget aide, mais ce n'est pas obligatoire."]],disc:"Aucun revenu n'est garanti."},
+finance:{tag:"Finance personnelle",bul:["Calculateur d’épargne (démo)","Comparatif de quelques outils de suivi","Une recommandation adaptée à ta priorité"],cta:"Voir l’outil recommandé",faq:[["Est-ce un conseil financier ?","Non, c'est informatif uniquement."],["Y a-t-il des risques ?","Tout investissement comporte un risque de perte en capital."]],disc:"Ceci n’est pas un conseil financier."}
+};
+/* ===== OUTILS ===== */
+const $=s=>document.querySelector(s);
+const ST={g(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},s(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},r(k){try{localStorage.removeItem(k)}catch(e){}}};
+const EMAIL_RE=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+let st={step:0,sector:null,answers:[],profile:{focus:null,temp:"froid",pct:0},done:false};
+const TRACK={utm:{},init(){const p=new URLSearchParams(location.search);["utm_source","utm_medium","utm_campaign","subid"].forEach(k=>{if(p.get(k))this.utm[k]=p.get(k)});if(Object.keys(this.utm).length)ST.s("funnel_utm",this.utm);else this.utm=ST.g("funnel_utm",{})},
+ event(){/* point d'extension : brancher plus tard un outil de mesure */},
+ base(sec,focus){return CONFIG.affiliates[sec+":"+focus]||CONFIG.affiliates[sec]||""},
+ url(sec,focus){const b=this.base(sec,focus),src=this.utm.subid||this.utm.utm_source||"direct",sep=b.includes("?")?"&":"?";
+  if(b.includes("clickbank.net"))return b+sep+"tid="+(sec+src).replace(/[^a-z0-9]/gi,"").slice(0,24);
+  return b+sep+"subid="+encodeURIComponent(src)}};
+const total=()=>st.sector?1+SQ[st.sector].length:2;
+const cur=()=>st.step===0?[ "Quel est ton objectif principal ?",SECTORS.map(s=>[s[1]])]:SQ[st.sector][st.step-1];
+const save=()=>ST.s("fq",{step:st.step,sector:st.sector,answers:st.answers});
+/* ===== QUIZ ===== */
+function show(id){["hero","quiz","result","module"].forEach(x=>$("#"+x).classList.toggle("hidden",x!==id))}
+function render(){
+ const q=cur(),n=total(),pct=Math.round(st.step/n*100);
+ $("#qCount").textContent="Question "+(st.step+1)+" / "+n;$("#qText").textContent=q[0];
+ $("#barFill").style.width=pct+"%";$("#bar").setAttribute("aria-valuenow",pct);
+ $("#qOptions").innerHTML="";
+ q[1].forEach((o,i)=>{const b=document.createElement("button");b.type="button";b.className="option"+(st.answers[st.step]===i?" selected":"");b.setAttribute("aria-pressed",st.answers[st.step]===i);b.textContent=o[0];b.onclick=()=>pick(i);$("#qOptions").appendChild(b)});
+ $("#backBtn").disabled=st.step===0;$("#nextBtn").disabled=st.answers[st.step]===undefined;
+ $("#nextBtn").textContent=st.step===n-1&&st.sector?"Voir mon plan":"Suivant";save();
+}
+function pick(i){
+ if(st.step===0&&st.sector!==SECTORS[i][0]){st.sector=SECTORS[i][0];st.answers=[];document.documentElement.style.setProperty("--niche",CONFIG.colors[st.sector]);TRACK.event("sector",st.sector)}
+ st.answers[st.step]=i;render();
+}
+function next(){if(st.answers[st.step]===undefined)return;if(st.sector&&st.step===total()-1){compute();result()}else{st.step++;render();$("#qText").focus&&0}}
+function back(){if(st.step>0){st.step--;render()}}
+function compute(){
+ const qs=SQ[st.sector];let heat=0,max=0,focus=null;
+ qs.forEach((q,i)=>{max+=Math.max(...q[1].map(o=>o[1]||0));const o=q[1][st.answers[i+1]];if(!o)return;heat+=o[1]||0;if(o[2]&&!focus)focus=o[2]});
+ const pct=max?Math.round(heat/max*100):0;
+ st.profile={focus,pct,temp:pct>=75?"très chaud":pct>=50?"chaud":pct>=25?"tiède":"froid"};st.done=true;ST.r("fq");TRACK.event("complete",st.profile);
+}
+function result(){
+ show("result");const p=st.profile;
+ $("#resultTitle").textContent="Profil : "+TITLES[st.sector];
+ $("#resultDesc").textContent="Axe prioritaire : "+(FOCUS[p.focus]||"général")+". Laisse ton email pour recevoir ton plan détaillé.";
+ setTimeout(()=>$("#scoreFill").style.width=Math.max(8,p.pct)+"%",100);
+}
+/* ===== LEADS (via Vercel -> Brevo) ===== */
+async function submitLead(email,source,website){
+ if(!CONFIG.apiBase)return false;
+ try{
+  const r=await fetch(CONFIG.apiBase+"/api/lead",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,consent:true,website:website||"",source,sector:st.sector,focus:st.profile.focus,temp:st.profile.temp})});
+  const j=await r.json().catch(()=>({}));return r.ok&&j.ok===true;
+ }catch(e){return false}
+}
+$("#leadForm").addEventListener("submit",async e=>{
+ e.preventDefault();const email=$("#email").value.trim();
+ if(!EMAIL_RE.test(email)){$("#email").focus();return}
+ if(!$("#consent").checked){$("#consent").focus();return}
+ const btn=e.target.querySelector("button");btn.disabled=true;btn.textContent="Envoi…";$("#leadError").classList.add("hidden");
+ const ok=await submitLead(email,"main",$("#website").value);
+ btn.disabled=false;btn.textContent="Recevoir mon plan";
+ if(!ok){$("#leadError").classList.remove("hidden");return}
+ ST.s("lead_done",1);e.target.classList.add("hidden");$("#leadOk").classList.remove("hidden");TRACK.event("lead",st.sector);
+});
+$("#revealBtn").onclick=showModule;
+/* ===== MODULE ===== */
+function showModule(){
+ show("module");const sec=st.sector,M=MOD[sec],p=st.profile,hot=p.temp==="chaud"||p.temp==="très chaud";
+ const base=TRACK.base(sec,p.focus),link=/TON-LIEN/.test(base)?'<p class="note">Offre bientôt disponible.</p>':`<a class="btn" id="affBtn" href="${TRACK.url(sec,p.focus)}" target="_blank" rel="nofollow sponsored noopener">${hot?M.cta:"Découvrir la recommandation"}</a>`;
+ $("#module").innerHTML=`<span class="tag">${M.tag}</span><h2>Ton plan ${TITLES[sec].toLowerCase()}${p.focus?" : "+FOCUS[p.focus]:""}</h2>
+ <p>${hot?"Voici ce qui correspond le mieux à ta situation :":"Commence par ces étapes simples, tu pourras aller plus loin ensuite :"}</p>
+ <ul>${M.bul.map(b=>`<li>${b}</li>`).join("")}</ul>
+ <div class="row">${link}<button class="btn ghost" id="faqBtn">Questions fréquentes</button></div>
+ <div id="faq" class="hidden">${M.faq.map(f=>`<details><summary>${f[0]}</summary><p>${f[1]}</p></details>`).join("")}</div>
+ <div class="disc">${M.disc} Lien affilié : commission perçue sans surcoût pour toi.</div>`;
+ $("#faqBtn").onclick=()=>$("#faq").classList.toggle("hidden");
+ const a=$("#affBtn");if(a)a.addEventListener("click",()=>TRACK.event("click",sec));
+ $("#module").scrollIntoView({behavior:"smooth",block:"start"});
+}
+/* ===== EXIT INTENT (ordinateur, une seule fois, si pas encore inscrit) ===== */
+let exitShown=false;
+document.addEventListener("mouseout",e=>{
+ if(exitShown||e.relatedTarget||e.clientY>0||ST.g("lead_done",0)||ST.g("exit_shown",0))return;
+ exitShown=true;ST.s("exit_shown",1);$("#exitIntent").classList.remove("hidden");$("#exitEmail").focus();
+});
+const closeExit=()=>$("#exitIntent").classList.add("hidden");
+$("#exitClose").onclick=closeExit;
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeExit()});
+$("#exitForm").addEventListener("submit",async e=>{
+ e.preventDefault();const email=$("#exitEmail").value.trim();
+ if(!EMAIL_RE.test(email)){$("#exitEmail").focus();return}
+ if(!$("#exitConsent").checked){$("#exitConsent").focus();return}
+ const ok=await submitLead(email,"exit","");
+ if(!ok){$("#exitError").classList.remove("hidden");return}
+ ST.s("lead_done",1);closeExit();
+});
+/* ===== DÉMARRAGE ===== */
+function start(){ST.r("fq");st={step:0,sector:null,answers:[],profile:{focus:null,temp:"froid",pct:0},done:false};show("quiz");render()}
+$("#startQuiz").onclick=start;$("#nextBtn").onclick=next;$("#backBtn").onclick=back;
+$("#resumeQuiz").onclick=()=>{const s=ST.g("fq",null);if(!s||!s.sector)return start();st={...st,...s};document.documentElement.style.setProperty("--niche",CONFIG.colors[st.sector]);show("quiz");render()};
+(function init(){
+ TRACK.init();$("#year").textContent=new Date().getFullYear();
+ const s=ST.g("fq",null);if(s&&s.sector&&s.answers&&s.answers.length)$("#resumeQuiz").classList.remove("hidden");
+})();
+</script></body></html>
